@@ -1,0 +1,3 @@
+nodemon -> untuk restarting applikasi secara otomatis, jika ada perubahan
+concurrently -> berfungsi untuk dapat menjalannkan multiple command dalam 1 baris sekaligus
+cors -> berfungsi untuk security response & request data
