@@ -1,7 +1,7 @@
 import { development } from "../config/db.config";
-
 const Pool = require("pg").Pool;
-const pool = new Pool({
+
+export const pool = new Pool({
     user: development.username,
     host: development.host,
     database: development.database,
@@ -14,5 +14,3 @@ pool.connect((error:any) => {
     if (error) throw error;
     console.log("Successfully connected to the database");
 });
-
-export default pool;
