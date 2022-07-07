@@ -14,5 +14,5 @@ route.use((req: Request, res: Response) => {
     });
 });
 
-router.post("/login", auth.login );
+router.post("/login", auth.login);
 router.get("/mesin", db.getmesin);
