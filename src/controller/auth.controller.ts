@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { Validator } from "node-input-validator";
-import {pool} from "../model/db.js";
+import { queryCustomPgsql } from "../model/model.js";
 
 export const login = async (req: Request, res: Response) => {
 
@@ -9,7 +9,7 @@ export const login = async (req: Request, res: Response) => {
         password4: 'required'
     });
 
-    v.check().then((matched) => {
+    await v.check().then((matched) => {
         if (!matched) {
             res.status(422).send(v.errors);
             return 0;
@@ -19,19 +19,19 @@ export const login = async (req: Request, res: Response) => {
         let username3 = req.body.username2;
         let password3 = req.body.password4;
 
-        pool.query(query2, [username3, password3], (error: any, results: any) => {
-            if (results.rowCount == 0) {
-                return res.send({
-                    status: "No Matched",
+        queryCustomPgsql(query2, [username3, password3], 1, (err: any, data: any) => {
+            if (data.rowCount == 0) {
+                return res.status(500).send({
+                    status: "Error : No Macthed",
+                    code: 500,
                     message: "Username or password not correct,please check again!",
-
                 });
             }
             return res.send({
                 status: "success",
                 code: 200,
                 message: "user has successfully login!",
-                // data : results.rows,
+                // data : data.rows,
 
             });
         });
