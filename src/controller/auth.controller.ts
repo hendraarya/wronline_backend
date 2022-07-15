@@ -15,11 +15,12 @@ export const login = async (req: Request, res: Response) => {
             return 0;
         }
 
-        let query2 = 'SELECT * FROM nmax.muser where suser =$1 and spasswd = $2';
+        let query2 = `SELECT * FROM nmax.muser where suser =$1 and spasswd = $2`;
         let username3 = req.body.username2;
         let password3 = req.body.password4;
 
         queryCustomPgsql(query2, [username3, password3], 1, (err: any, data: any) => {
+            console.log(data.rows);
             if (data.rowCount == 0) {
                 return res.status(500).send({
                     status: "Error : No Macthed",
@@ -31,9 +32,10 @@ export const login = async (req: Request, res: Response) => {
                 status: "success",
                 code: 200,
                 message: "user has successfully login!",
-                // data : data.rows,
+                data : data.rows,
 
             });
+           
         });
 
     });

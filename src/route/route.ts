@@ -1,5 +1,6 @@
 import express, { Express, Router, Response, Request } from "express";
 import * as auth from "../controller/auth.controller.js";
+import * as wronline from "../controller/wr.controller.js";
 
 const db = require('../queries');
 
@@ -15,4 +16,5 @@ route.use((req: Request, res: Response) => {
 });
 
 router.post("/login", auth.login);
+router.post("/getnikname", wronline.add_wr);
 router.get("/mesin", db.getmesin);

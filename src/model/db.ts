@@ -1,4 +1,4 @@
-import { development_nmax, development_mta } from "../config/db.config";
+import { development_nmax, development_mta, development_hris } from "../config/db.config";
 const Pool = require("pg").Pool;
 
 export const pool = new Pool({
@@ -16,6 +16,13 @@ export const poolmta = new Pool({
     password: development_mta.password,
     port: development_mta.port,
 });
+export const poolhris= new Pool({
+    user: development_hris.username,
+    host: development_hris.host,
+    database: development_hris.database,
+    password: development_hris.password,
+    port: development_hris.port,
+});
 
 //open the Postgres Connection
 pool.connect((error:any) => {
@@ -26,4 +33,9 @@ pool.connect((error:any) => {
 poolmta.connect((error:any) => {
     if (error) throw error;
     console.log("Successfully connected to the database MTA");
+});
+
+poolhris.connect((error:any) => {
+    if (error) throw error;
+    console.log("Successfully connected to the database Karyawan");
 });

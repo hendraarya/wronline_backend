@@ -1,7 +1,7 @@
-import {pool,poolmta} from "./db";
+import {pool,poolhris,poolmta} from "./db";
 
 export const queryCustomPgsql = (customQuery: string, param:any,switchquery:any,result: any) => {
-    if(switchquery == 1)
+    if(switchquery == 'dbNmax')
     {
     pool.query(customQuery, param,(err: any,res: any) => {
         if(err){
@@ -12,9 +12,20 @@ export const queryCustomPgsql = (customQuery: string, param:any,switchquery:any,
         result(null,res);
     });
 }
-  else if (switchquery == 2)
+  else if (switchquery == 'dbMta')
   {
     poolmta.query(customQuery, param,(err: any,res: any) => {
+        if(err){
+            console.log("error:", err);
+            result(err,null);
+            return;
+        }
+        result(null,res);
+    });
+  }
+  else if (switchquery == 'dbHris')
+  {
+    poolhris.query(customQuery, param,(err: any,res: any) => {
         if(err){
             console.log("error:", err);
             result(err,null);

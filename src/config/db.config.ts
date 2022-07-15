@@ -33,3 +33,12 @@ export const development_mta: DatabaseConfig = {
   port: 5432,
   dialect: "pgsql",
 };
+
+export const development_hris: DatabaseConfig = {
+  username: "postgres",
+  password: "postgres",
+  database: "appmhris",
+  host: "10.202.10.199",
+  port: 5432,
+  dialect: "pgsql",
+};
