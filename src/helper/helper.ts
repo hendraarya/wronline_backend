@@ -1,5 +1,5 @@
-import { rejects } from "assert";
 import { Request, Response } from "express";
+import { resolve } from "path";
 import { queryCustomPgsql } from "../model/model";
 
 
@@ -19,48 +19,52 @@ export const getNikname = (req: Request, res: Response, nik: string) => {
     return new Promise((resolve) => {
         let saveGetnik = nik;
         const querygetNik: string = 'SELECT strname from synchris.mempdata WHERE strprno = $1';
-        queryCustomPgsql(querygetNik, [saveGetnik], 'dbHris', (error: any, data: any) => {
-            if (error) {
+        queryCustomPgsql(querygetNik, [saveGetnik], 'dbHris', (err: any, data: any) => {
+            if (err) {
                 return res.status(500).send({
-                    message: error.message || "NIK tidak ada.",
+                    message: err.message || "NIK tidak ada.",
                 });
             } else {
-                resolve(data.rows);
-            }
-
-            //  return res.send({
-            //         status: "success",
-            //         code: 200,
-            //         message: "data nik berhasil diget22",
-            //         data: data.rows,
-
-            //     });
-        });
-    });
-};
-
-export const getMachinename = (req:Request, res:Response, machineid: string) => {
-    return new Promise((resolve,rejects) => {
-        let saveGetmachinename = machineid;
-        const queryMachine: string = 'SELECT strdescription from mta.mmachine WHERE machid = $1';
-        queryCustomPgsql(queryMachine, [saveGetmachinename], 'dbMta', (error:any, data:any) => {
-            if(error){
-                return res.status(500).send({
-                    message: error.message || "Machine ID ini tidak ada",
-                });
-            }
-            else{
-                if(data.length !== 0)
-                {
-                    resolve(data.rows)
-                }
+                if(data.rows.length !== 0){
+                    resolve(data.rows[0].strname);
+                } 
                 else {
-                    return res.status(500).send({
-                        message: error.message || "Machine ID ini tidak ada",
-                    });
+                    resolve(false);
                 }
                 
             }
         });
     });
 };
+
+export const getMachinename = (req: Request, res: Response, machineid: string) => {
+    return new Promise((resolve, rejects) => {
+        let saveGetmachinename = machineid;
+        const queryMachine: string = 'SELECT strdescription from mta.mmachine WHERE machid = $1';
+        queryCustomPgsql(queryMachine, [saveGetmachinename], 'dbMta', (error: any, data: any) => {
+            if (error) {
+                return res.status(500).send({
+                    message: error.message || "Machine ID ini tidak ada",
+                });
+            } else {
+                if (data.rows.length !== 0) {
+                    console.log(data.rows[0].strdescription);
+                    resolve(data.rows[0].strdescription);
+                } else {
+                    console.log(data.rows);
+                    resolve(false);
+                }
+
+            }
+        });
+    });
+};
+
+export const findSubstr = (getId: any) => {
+    return new Promise((resolve) => {
+        var nilai = getId;
+        var stringdate = String(nilai).substring(0,2);
+        resolve(stringdate);
+
+    });
+}

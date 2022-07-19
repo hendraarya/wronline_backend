@@ -17,10 +17,10 @@ export const production: DatabaseConfig = {
 };
 
 export const development_nmax: DatabaseConfig = {
-  username: "postgres",
-  password: "postgres",
+  username: "hendra",
+  password: "hendra-118208",
   database: "nmax",
-  host: "10.202.10.77",
+  host: "10.202.10.111",
   port: 5432,
   dialect: "pgsql",
 };
