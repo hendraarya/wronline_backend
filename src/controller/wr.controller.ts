@@ -1,6 +1,6 @@
 import {Response, Request} from "express";
 import { Validator } from "node-input-validator";
-import { validatorErrors, getNikname, getMachinename, setSwr} from "../helper/helper";
+import { validatorErrors, getNikname, getMachinename, setSwr, getPriority} from "../helper/helper";
 import { QueryBuilderNmax} from "../model/model";
 import moment from "moment";
 
@@ -15,7 +15,6 @@ export const add_wr = (req: Request, res: Response) => {
         trepair: "required",
         sproblem: "required|string",
         stype: "required|string",
-        surgency: "required|string"
     });
 
 
@@ -36,8 +35,12 @@ export const add_wr = (req: Request, res: Response) => {
             const getValuenik: any = await getNikname(req, res, snik);
             const getValuanmachinename: any = await getMachinename(req, res, smach);
             const getSwr: any = await setSwr(req,res);
+            let sectionid: string =  getValuanmachinename[1];
+            let setPriority: any = [sectionid, stype, surgency];
+            const getPriorityMachine: any = await getPriority(req,res, setPriority);
+            // console.log("Nilai getvalue Machine", getValuanmachinename);
 
-            if (!getValuanmachinename || !getValuenik) {
+            if (!getValuanmachinename[0] || !getValuenik) {
                 // console.log("Nilai:", [getValuenik, getValuanmachinename]);
                 return res.status(409).send({
                     status: "Not Found",
@@ -56,7 +59,7 @@ export const add_wr = (req: Request, res: Response) => {
                     snik: snik,
                     snikname: getValuenik,
                     smach: smach,
-                    smachname: getValuanmachinename,
+                    smachname: getValuanmachinename[0],
                     drepair: drepair,
                     trepair: trepair,
                     sproblem: sproblem,
@@ -64,6 +67,9 @@ export const add_wr = (req: Request, res: Response) => {
                     surgency: surgency,
                     dinput: dateTimeNow,
                     dupdate: dateTimeNow,
+                    spriority: getPriorityMachine[0],
+                    smachsect: getPriorityMachine[1],
+                    smachsectname: getPriorityMachine[2]
                 };
                 QueryBuilderNmax(table)
                     .insert(columnToInsert)
