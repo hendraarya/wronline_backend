@@ -3,6 +3,7 @@ import { Validator } from "node-input-validator";
 import { validatorErrors, getNikname, getMachinename, setSwr, getPriority} from "../helper/helper";
 import { QueryBuilderNmax} from "../model/model";
 import moment from "moment";
+var nodemailer = require('nodemailer');
 
 let regisWr: number = 1;
 const table: string = "nmax.xwr";
@@ -85,7 +86,38 @@ export const add_wr = (req: Request, res: Response) => {
                         return res.status(500).send({
                             message: err.message,
                         });
-                    })
+                    });
+
+                    // start send email to gmail
+
+                    let transport = nodemailer.createTransport({
+                        host: "smtp.gmail.com",
+                        port: 465,
+                        secure: true,
+                        auth: {
+                            user: "hendraarya.nin@gmail.com",
+                            pass: "nin118208"
+                        },
+                        debug: true,
+                        logger: true
+                    });
+                    
+                    let scrapeEmailMessage = {
+                        //from: 'myemail@gmail.com',
+                        to: 'hendra@nok.co.id',
+                        subject: 'Hello World',
+                        text: 'hello world'
+                    };
+                    
+                
+                    transport.sendMail(scrapeEmailMessage, function(err: any, data: any) {
+                        if(err) {
+                            console.log(err);
+                        } else {
+                            console.log('Email sent successfully');
+                        }
+                    });
+                      // End send email to gmai
             }
         };
     });

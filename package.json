@@ -24,6 +24,7 @@
     "moment-timezone": "^0.5.34",
     "node-input-validator": "^4.5.0",
     "nodejs-nodemailer-outlook": "^1.2.4",
+    "nodemailer": "^4.7.0",
     "pg": "^8.7.3",
     "prettier": "^2.7.1"
   },
