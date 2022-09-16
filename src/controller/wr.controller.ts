@@ -45,7 +45,27 @@ export const add_wr = (req: Request, res: Response) => {
             let sectionid: string = getValuanmachinename[1];
             let setPriority: any = [sectionid, stype, surgency];
             const getPriorityMachine: any = await getPriority(req, res, setPriority);
+            const attachname: string = `${getSwr}.xlsx`;
+            const pathattachname: string = `./src/Excelform/WRonlineexcel/${getSwr}.xlsx`;
             // console.log("Nilai getvalue Machine", getValuanmachinename);
+            // Load a new blank workbook
+            await XlsxPopulate.fromFileAsync("./src/Excelform/WR.xlsx")
+                .then((workbook: any) => {
+                    // Modify the workbook.
+                    workbook.sheet("Sheet2").cell("I4").value(getSwr);
+                    workbook.sheet("Sheet2").cell("C6").value(moment(drepair).format('DD-MM-YYYY'));
+                    workbook.sheet("Sheet2").cell("C7").value(trepair);
+                    workbook.sheet("Sheet2").cell("C8").value(smach);
+                    workbook.sheet("Sheet2").cell("C9").value(getValuanmachinename[0]);
+                    workbook.sheet("Sheet2").cell("C10").value(getPriorityMachine[2]);
+                    workbook.sheet("Sheet2").cell("F11").value(getValuenik);
+                    workbook.sheet("Sheet2").cell("A22").value(sproblem);
+                    workbook.sheet("Sheet2").cell("G14").value("𐩕");
+
+                    // Write to file.
+                    return workbook.toFileAsync(`./src/Excelform/WRonlineexcel/${getSwr}.xlsx`);
+                });
+
 
             if (!getValuanmachinename[0] || !getValuenik) {
                 // console.log("Nilai:", [getValuenik, getValuanmachinename]);
@@ -60,8 +80,6 @@ export const add_wr = (req: Request, res: Response) => {
                 // const convertRegis = String(regisWr).padStart(2, '0');
                 // const sWrn = "WR" + Tgl.toString().substring(8, 10) + Tgl.toString().substring(3, 5) + Tgl.toString().substring(0, 2) + "-" + convertRegis;
                 // console.log("Tanggal Sekarang :", [sWrn, Tgl, getSwr]);
-
-
 
                 console.log("getSwrDb:", [getSwr]);
                 const columnToInsert = {
@@ -79,7 +97,9 @@ export const add_wr = (req: Request, res: Response) => {
                     dupdate: dateTimeNow,
                     spriority: getPriorityMachine[0],
                     smachsect: getPriorityMachine[1],
-                    smachsectname: getPriorityMachine[2]
+                    smachsectname: getPriorityMachine[2],
+                    sattach: pathattachname,
+                    sattachname: attachname
                 };
                 await QueryBuilderNmax(table)
                     .insert(columnToInsert)
@@ -99,24 +119,7 @@ export const add_wr = (req: Request, res: Response) => {
                     });
 
 
-                const XlsxPopulate = require('xlsx-populate');
 
-                // Load a new blank workbook
-                await XlsxPopulate.fromFileAsync("./WR.xlsx")
-                    .then((workbook: any) => {
-                        // Modify the workbook.
-                        workbook.sheet("Sheet2").cell("I4").value(getSwr);
-                        workbook.sheet("Sheet2").cell("C6").value(moment(drepair).format('DD-MM-YYYY'));
-                        workbook.sheet("Sheet2").cell("C7").value(trepair);
-                        workbook.sheet("Sheet2").cell("C8").value(smach);
-                        workbook.sheet("Sheet2").cell("C9").value(getValuanmachinename[0]);
-                        workbook.sheet("Sheet2").cell("C10").value(getPriorityMachine[2]);
-                        workbook.sheet("Sheet2").cell("F11").value(getValuenik);
-                        workbook.sheet("Sheet2").cell("A22").value(sproblem);
-
-                        // Write to file.
-                        return workbook.toFileAsync(`./${getSwr}.xlsx`);
-                    });
 
 
                 // start send email to gmail
