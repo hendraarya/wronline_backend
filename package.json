@@ -1,7 +1,6 @@
 {
   "name": "wronline_backend2",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "type": "commonjs",
   "scripts": {
@@ -15,7 +14,7 @@
   "author": "Hendra Arya",
   "license": "ISC",
   "dependencies": {
-    "app-root-path": "^3.0.0",
+    "app-root-path": "^3.1.0",
     "cors": "^2.8.5",
     "express": "^4.18.1",
     "express-validator": "^6.14.2",
@@ -26,7 +25,8 @@
     "nodejs-nodemailer-outlook": "^1.2.4",
     "nodemailer": "^4.7.0",
     "pg": "^8.7.3",
-    "prettier": "^2.7.1"
+    "prettier": "^2.7.1",
+    "xlsx-populate": "^1.21.0"
   },
   "devDependencies": {
     "@types/app-root-path": "^1.2.4",
@@ -37,5 +37,14 @@
     "concurrently": "^7.2.2",
     "nodemon": "^2.0.18",
     "typescript": "^4.7.4"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hendraarya/wronline_backend.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hendraarya/wronline_backend/issues"
+  },
+  "homepage": "https://github.com/hendraarya/wronline_backend#readme",
+  "description": ""
 }
