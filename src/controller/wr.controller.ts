@@ -6,13 +6,15 @@ import moment from "moment";
 
 //Library Excel
 const XlsxPopulate = require('xlsx-populate');
-var fs = require('fs');
-
-
-var nodemailer = require('nodemailer');
 
 let regisWr: number = 1;
 const table: string = "nmax.xwr";
+
+let CellG14: string = "( )";
+let CellG15: string = "( )";
+let CellG16: string = "( )";
+let CellH16: string = "( )";
+
 
 export const add_wr = (req: Request, res: Response) => {
     const validator = new Validator(req.body, {
@@ -45,6 +47,36 @@ export const add_wr = (req: Request, res: Response) => {
             let sectionid: string = getValuanmachinename[1];
             let setPriority: any = [sectionid, stype, surgency];
             const getPriorityMachine: any = await getPriority(req, res, setPriority);
+
+            //start set symbol to Worksheet Excel WR Online
+            if (stype === "EMERGENCY STOP") {
+                CellG14 = "(O)";
+                CellG15 = "( )";
+                CellG16 = "( )";
+            }
+            else if (stype === "MACHINE MULFUNCTION") {
+                CellG14 = "( )";
+                CellG15 = "(O)";
+                CellG16 = "( )";
+
+            }
+            else if (stype === "PLAN") {
+                CellG14 = "( )";
+                CellG15 = "( )";
+                CellG16 = "(O)";
+                CellH16 = "PLAN";
+
+            }
+            else if (stype === "OTHER") {
+                CellG14 = "( )";
+                CellG15 = "( )";
+                CellG16 = "(O)";
+                CellH16 = "OTHERS";
+
+            }
+            //end set symbol to Worksheet Excel WR Online
+            console.log("stype :", stype);
+
             const attachname: string = `${getSwr}.xlsx`;
             const pathattachname: string = `./src/Excelform/WRonlineexcel/${getSwr}.xlsx`;
             // console.log("Nilai getvalue Machine", getValuanmachinename);
@@ -60,7 +92,10 @@ export const add_wr = (req: Request, res: Response) => {
                     workbook.sheet("Sheet2").cell("C10").value(getPriorityMachine[2]);
                     workbook.sheet("Sheet2").cell("F11").value(getValuenik);
                     workbook.sheet("Sheet2").cell("A22").value(sproblem);
-                    workbook.sheet("Sheet2").cell("G14").value("𐩕");
+                    workbook.sheet("Sheet2").cell("G14").value(CellG14);
+                    workbook.sheet("Sheet2").cell("G15").value(CellG15);
+                    workbook.sheet("Sheet2").cell("G16").value(CellG16);
+                    workbook.sheet("Sheet2").cell("H16").value(CellH16);
 
                     // Write to file.
                     return workbook.toFileAsync(`./src/Excelform/WRonlineexcel/${getSwr}.xlsx`);
@@ -117,41 +152,6 @@ export const add_wr = (req: Request, res: Response) => {
                             message: err.message,
                         });
                     });
-
-
-
-
-
-                // start send email to gmail
-
-                // let transport = nodemailer.createTransport({
-                //     host: "smtp.gmail.com",
-                //     port: 465,
-                //     secure: true,
-                //     auth: {
-                //         user: "hendraarya.nin@gmail.com",
-                //         pass: "nin118208"
-                //     },
-                //     debug: true,
-                //     logger: true
-                // });
-
-                // let scrapeEmailMessage = {
-                //     //from: 'myemail@gmail.com',
-                //     to: 'hendra@nok.co.id',
-                //     subject: 'Hello World',
-                //     text: 'hello world'
-                // };
-
-
-                // transport.sendMail(scrapeEmailMessage, function(err: any, data: any) {
-                //     if(err) {
-                //         console.log(err);
-                //     } else {
-                //         console.log('Email sent successfully');
-                //     }
-                // });
-                // End send email to gmai
             }
         };
     });
