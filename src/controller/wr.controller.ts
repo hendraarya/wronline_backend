@@ -1,11 +1,13 @@
 import { Response, Request } from "express";
 import { Validator } from "node-input-validator";
 import { validatorErrors, getNikname, getMachinename, setSwr, getPriority } from "../helper/helper";
-import { QueryBuilderNmax } from "../model/model";
+import { QueryBuilderNmax, queryCustomPgsql } from "../model/model";
 import moment from "moment";
 
 //Library Excel
 const XlsxPopulate = require('xlsx-populate');
+
+
 
 let regisWr: number = 1;
 const table: string = "nmax.xwr";
@@ -155,4 +157,113 @@ export const add_wr = (req: Request, res: Response) => {
             }
         };
     });
+};
+
+export const getalldata_wr = async (req: Request, res: Response) => {
+
+    await QueryBuilderNmax(table)
+        .select('*')
+        .orderBy('dinput', 'DESC')
+        .then(async (result: any) => {
+
+            const keyFormat = "YYYY-MM-DD"
+            const groupReadings = (readings: any) => {
+                const groups: any = []
+                readings.forEach((reading: any) => {
+                    const dateMoment = moment(reading.dinput)
+                    const dateKey = dateMoment.format(keyFormat)
+
+                    let dateData = groups.find((x: any) => x.date === dateKey)
+                    if (!dateData) {
+                        dateData = {
+                            date: dateKey,
+                            values: []
+                        }
+                        groups.push(dateData)
+                    }
+
+                    let groupedReading = dateData.values.find((x: any) => x.t === reading.dinput)
+                    if (!groupedReading) {
+                        groupedReading = {
+                            swr: reading.swr,
+                            snik: reading.snik,
+                            snikname: reading.snikname,
+                            smach: reading.smach,
+                            smachname: reading.smachname,
+                            drepair: reading.drepair,
+                            trepair: reading.trepair,
+                            sproblem: reading.sproblem,
+                            surgency: reading.surgency,
+                            dinput: reading.dinput,
+                            dupdate: reading.dupdate,
+                            spriority: reading.spriority,
+                            sstatus: reading.sstatus,
+                            sremark: reading.sremark
+
+                        }
+                        dateData.values.push(groupedReading)
+                    }
+                })
+
+                return groups
+            }
+
+            const result2 = groupReadings(result)
+
+
+            return res.send({
+                status: "Show Data Success !",
+                data: {
+                    dataresult: result2
+                }
+            })
+
+
+        })
+        .catch((err: any) => {
+            return res.status(500).send({
+                message:
+                    err.message || "Some error occurred while retrieving data.",
+            });
+        })
+
+}
+
+export const countdataallwr = async (req: Request, res: Response) => {
+    await QueryBuilderNmax(table)
+        .count('swr')
+        .then(async (result: any) => {
+            if (result) {
+                return res.send({
+                    status: "Show Data Success !",
+                    data: result
+                })
+            }
+        })
+        .catch((err: any) => {
+            return res.status(500).send({
+                message:
+                    err.message || "Some error occurred while retrieving data.",
+            });
+        })
+};
+
+export const countdatawrtoday = async (req: Request, res: Response) => {
+    await QueryBuilderNmax(table)
+        .whereRaw('date(dinput) = date(now())')
+        .count('swr')
+        .then(async (result: any) => {
+            if (result) {
+                return res.send({
+                    status: "Show Data Success !",
+                    data: result
+                })
+            }
+        })
+        .catch((err: any) => {
+            return res.status(500).send({
+                message:
+                    err.message || "Some error occurred while retrieving data.",
+            });
+        })
 };

@@ -18,3 +18,6 @@ route.use((req: Request, res: Response) => {
 router.post("/login", auth.login);
 router.post("/getnikname", wronline.add_wr);
 router.get("/mesin", db.getmesin);
+router.get("/countdataallwr", wronline.countdataallwr);
+router.get("/countdatawrtoday", wronline.countdatawrtoday);
+router.get("/getalldata_wr", wronline.getalldata_wr);
