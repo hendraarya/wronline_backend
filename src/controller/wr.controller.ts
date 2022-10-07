@@ -7,10 +7,25 @@ import moment from "moment";
 //Library Excel
 const XlsxPopulate = require('xlsx-populate');
 
-
-
 let regisWr: number = 1;
 const table: string = "nmax.xwr";
+const column: Array<string> = [
+    "swr",
+    "snik",
+    "snikname",
+    "smach",
+    "smachname",
+    "drepair",
+    "trepair",
+    "sproblem",
+    "stype",
+    "surgency",
+    "dinput",
+    "spriority",
+    "smachsect",
+    "sstatus",
+    "sremark",
+];
 
 let CellG14: string = "( )";
 let CellG15: string = "( )";
@@ -160,72 +175,86 @@ export const add_wr = (req: Request, res: Response) => {
 };
 
 export const getalldata_wr = async (req: Request, res: Response) => {
+    const validator = new Validator(req.params, {
+        limit: "required",
+    });
 
-    await QueryBuilderNmax(table)
-        .select('*')
-        .orderBy('dinput', 'DESC')
-        .then(async (result: any) => {
+    validator.check().then(async (matched: boolean) => {
+        if (!matched) {
+            validatorErrors(req, res, validator);
+        }
+        else {
+            let limit: string = req.params.limit;
+            let limitconvert: number = parseInt(limit);
+            await QueryBuilderNmax(table)
+                .select('*')
+                .orderBy('dinput', 'DESC')
+                .limit(limitconvert)
+                .then(async (result: any) => {
 
-            const keyFormat = "YYYY-MM-DD"
-            const groupReadings = (readings: any) => {
-                const groups: any = []
-                readings.forEach((reading: any) => {
-                    const dateMoment = moment(reading.dinput)
-                    const dateKey = dateMoment.format(keyFormat)
+                    const keyFormat = "YYYY-MM-DD"
+                    const groupReadings = (readings: any) => {
+                        const groups: any = []
+                        readings.forEach((reading: any) => {
+                            const dateMoment = moment(reading.dinput)
+                            const dateKey = dateMoment.format(keyFormat)
 
-                    let dateData = groups.find((x: any) => x.date === dateKey)
-                    if (!dateData) {
-                        dateData = {
-                            date: dateKey,
-                            values: []
-                        }
-                        groups.push(dateData)
+                            let dateData = groups.find((x: any) => x.date === dateKey)
+                            if (!dateData) {
+                                dateData = {
+                                    date: dateKey,
+                                    values: []
+                                }
+                                groups.push(dateData)
+                            }
+
+                            let groupedReading = dateData.values.find((x: any) => x.t === reading.dinput)
+                            if (!groupedReading) {
+                                groupedReading = {
+                                    swr: reading.swr,
+                                    snik: reading.snik,
+                                    snikname: reading.snikname,
+                                    smach: reading.smach,
+                                    smachname: reading.smachname,
+                                    drepair: reading.drepair,
+                                    trepair: reading.trepair,
+                                    sproblem: reading.sproblem,
+                                    surgency: reading.surgency,
+                                    dinput: reading.dinput,
+                                    dupdate: reading.dupdate,
+                                    spriority: reading.spriority,
+                                    sstatus: reading.sstatus,
+                                    sremark: reading.sremark
+
+                                }
+                                dateData.values.push(groupedReading)
+                            }
+                        })
+
+                        return groups
                     }
 
-                    let groupedReading = dateData.values.find((x: any) => x.t === reading.dinput)
-                    if (!groupedReading) {
-                        groupedReading = {
-                            swr: reading.swr,
-                            snik: reading.snik,
-                            snikname: reading.snikname,
-                            smach: reading.smach,
-                            smachname: reading.smachname,
-                            drepair: reading.drepair,
-                            trepair: reading.trepair,
-                            sproblem: reading.sproblem,
-                            surgency: reading.surgency,
-                            dinput: reading.dinput,
-                            dupdate: reading.dupdate,
-                            spriority: reading.spriority,
-                            sstatus: reading.sstatus,
-                            sremark: reading.sremark
+                    const result2 = groupReadings(result)
 
+
+                    return res.send({
+                        status: "Show Data Success !",
+                        data: {
+                            dataresult: result2
                         }
-                        dateData.values.push(groupedReading)
-                    }
+                    })
+
+
+                })
+                .catch((err: any) => {
+                    return res.status(500).send({
+                        message:
+                            err.message || "Some error occurred while retrieving data.",
+                    });
                 })
 
-                return groups
-            }
-
-            const result2 = groupReadings(result)
-
-
-            return res.send({
-                status: "Show Data Success !",
-                data: {
-                    dataresult: result2
-                }
-            })
-
-
-        })
-        .catch((err: any) => {
-            return res.status(500).send({
-                message:
-                    err.message || "Some error occurred while retrieving data.",
-            });
-        })
+        }
+    })
 
 }
 
@@ -268,4 +297,41 @@ export const countdatawrtoday = async (req: Request, res: Response) => {
         })
 };
 
-// Search Data WR Online 
+// Search Data WR Online by drepair
+export const searchdatawr = async (req: Request, res: Response) => {
+    const validator = new Validator(req.params, {
+        drepair: "required",
+    });
+
+    validator.check().then(async (matched: boolean) => {
+        if (!matched) {
+            validatorErrors(req, res, validator);
+        }
+        else {
+            const drepair: string = req.params.drepair;
+            await QueryBuilderNmax(table)
+                .where({ drepair: drepair })
+                .select(column)
+                .then((result: any) => {
+                    if (result) {
+                        res.send({
+                            status: "success",
+                            message: "Success get date drepair WR Online",
+                            data: result,
+                        });
+                    }
+                    else {
+                        res.send({
+                            status: "Empty",
+                            message: `Date WR Online with drepair ${drepair} is not available!`,
+                        });
+                    }
+                })
+                .catch((error: any) => {
+                    return res.status(500).send({
+                        message: error.message,
+                    });
+                });
+        }
+    })
+};
