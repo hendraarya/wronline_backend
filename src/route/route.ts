@@ -22,3 +22,4 @@ router.get("/countdataallwr", wronline.countdataallwr);
 router.get("/countdatawrtoday", wronline.countdatawrtoday);
 router.get("/getalldata_wr/:limit", wronline.getalldata_wr);
 router.get("/searchdatawr/:drepair", wronline.searchdatawr);
+router.get("/getcountallstatuswr", wronline.getcountallstatuswr);

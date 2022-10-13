@@ -335,3 +335,24 @@ export const searchdatawr = async (req: Request, res: Response) => {
         }
     })
 };
+
+//get Data Count Received, InProgress & Finished
+export const getcountallstatuswr = async (req: Request, res: Response) => {
+    await QueryBuilderNmax.raw(
+        "select (SELECT count(sstatus) as wr_received FROM nmax.xwr WHERE sstatus = 'RECEIVED' AND date(dinput) = date(now())), (select count(sstatus) as wr_inprogress from nmax.xwr WHERE sstatus= 'InProgress' AND date(dinput) = date(now())) , (select count(sstatus) as wr_finish from nmax.xwr WHERE sstatus= 'FINISHED' AND date(dinput) = date(now())) from nmax.xwr limit 1"
+    )
+        .then(async (result: any) => {
+            if (result) {
+                return res.send({
+                    status: "Show Data Success !",
+                    data: result
+                })
+            }
+        })
+        .catch((err: any) => {
+            return res.status(500).send({
+                message:
+                    err.message || "Some error occurred while retrieving data.",
+            });
+        })
+}
